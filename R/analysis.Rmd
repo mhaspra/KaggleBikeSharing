@@ -4,7 +4,20 @@ output: html_document
 runtime: shiny
 ---
 ## Load and prepare data
-###Load the data
+####Load the data
 ```{r, warning=FALSE}
 train <- read.csv("~/R-Workspace/KaggleBikeSharing/data/train.csv", stringsAsFactors=FALSE)
+```
+####create chron objects to get easy access to hours, months, etc.
+```{r, warning=FALSE}
+library('chron')
+dtparts = t(as.data.frame(strsplit(train$datetime,' ')))
+row.names(dtparts) = NULL
+thetimes = chron(dates=dtparts[,1],times=dtparts[,2],format=c('y-m-d','h:m:s'))
+```
+####store date and hour in original data set and assign labels to workingday variable
+```{r}
+train$date = as.Date(thetimes)
+train$hour <- hours(thetimes)
+train$workingday <- factor(train$workingday,levels=c(1,0),labels=c("workingday","non-working"))
 ```
